@@ -11,7 +11,7 @@ import { selectSendMessageIsOpen } from "./features/mailSlice";
 import { selectUser } from "./features/userSlice";
 import Login from "./components/Login/Login";
 import InboxIDs from "./components/api/InboxList";
-import { userData, displayEmails, clickRecord } from "./features/dataSlice";
+import { userData, displayEmails } from "./features/dataSlice";
 
 function App() {
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);

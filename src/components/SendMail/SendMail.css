@@ -66,6 +66,9 @@
 .sendMail-options button {
   float: right;
 }
+#selectImage {
+  background: aliceblue;
+}
 
 @media only screen and (max-width: 700px) {
   .sendMail {

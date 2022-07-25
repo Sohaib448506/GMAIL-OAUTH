@@ -11,6 +11,10 @@ function SendReply(props) {
     props.props.subject
   );
 
+  const [forwardEmailDescription, setForwardEmailDescription] = useState(
+    props.props.description
+  );
+
   const {
     register,
     handleSubmit,
@@ -32,28 +36,20 @@ function SendReply(props) {
           raw: window.btoa(email).replace(/\+/g, "-").replace(/\//g, "_"),
         },
       })
-      .then((res) => console.log("Reply Message has been Sent Successfully"))
+      .then(() => console.log("Forward Message has been Sent Successfully"))
       .catch((err) => console.log(err));
   }
   const onSubmit = (formData) => {
     const headers_obj = {
       To: formData.to,
-      Subject: formData.subject,
+      Subject: forwardSubject,
     };
-    const message = formData.message;
+    const message = forwardEmailDescription;
     sendMessage(headers_obj, message);
 
     dispatch(closeSendMessage());
     dispatch(forwardButtonClicked(false));
   };
-
-  var reply_to = props?.props.title?.replace(/\"<>/g, '"');
-  var reply_to_splitted = reply_to.split(" ");
-
-  var email_fetched = reply_to_splitted[reply_to_splitted.length - 1].slice(
-    1,
-    -1
-  );
 
   return (
     <div className="sendMail">
@@ -80,22 +76,20 @@ function SendReply(props) {
           contentEditable={true}
           value={forwardSubject}
           onChange={(e) => setForwardEmailSubject(e.target.value)}
-          {...register("subject", { required: true })}
+          required
         />
-        {errors.subject && (
-          <p className="sendMail-error">Subject is Required!</p>
-        )}
+
         <input
           name="message"
           placeholder="Write the Forward Message Here!"
           type="text"
           className="sendMail-message"
-          value={props.props.description}
-          {...register("message", { required: true })}
+          contentEditable={true}
+          value={forwardEmailDescription}
+          onChange={(e) => setForwardEmailDescription(e.target.value)}
+          required
         />
-        {errors.message && (
-          <p className="sendMail-error">Message is Required!</p>
-        )}
+
         <div className="sendMail-options">
           <Button
             type="submit"

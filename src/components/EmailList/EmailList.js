@@ -15,23 +15,13 @@ import Section from "../Section/Section";
 import EmailRow from "../EmailRow/EmailRow";
 import { selectUser } from "../../features/userSlice";
 
-import {
-  APIUserData,
-  userData,
-  displayEmails,
-  clickRecord,
-} from "../../features/dataSlice";
+import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
 import InboxIDs from "../../components/api/InboxList";
 
 function EmailList({ emailGathered }) {
   const [emailGatheredDestructurying, setEmailGatheredDestructurying] =
     useState([]);
-  const clickRecordOfMail = useSelector(clickRecord);
-  // console.log(
-  //   "🚀 ~ file: Mail.js ~ line 24 ~ Mail ~ clickRecordOfMail",
-  //   clickRecordOfMail
-  // );
 
   const user = useSelector(selectUser);
   const data = useSelector(APIUserData);
@@ -42,8 +32,6 @@ function EmailList({ emailGathered }) {
   const [prevPageIcon, setPrevPageIcon] = useState(true);
 
   var nextPageToken = data.data?.nextPageToken;
-
-  // const [nextPageTokenRecord, setNextPageTokenRecord] = useState(null);
 
   const [newEmailListIDs, setNewEmailListIDs] = useState([]);
   const [newEmailGathered, setNewEmailGathered] = useState([]);
@@ -226,6 +214,7 @@ function EmailList({ emailGathered }) {
           <IconButton
             onClick={() => {
               prevPage();
+              setLoad(true);
             }}
             disabled={prevPageIcon}
           >

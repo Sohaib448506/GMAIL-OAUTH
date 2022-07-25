@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { closeSendMessage } from "../../features/mailSlice";
 import { replyButtonClicked } from "../../features/dataSlice";
-import { useSelector } from "react-redux";
 
 function SendReply(props) {
+  const [forwardSubject, setForwardEmailSubject] = useState(
+    props.props.subject
+  );
   const {
     register,
     handleSubmit,
@@ -29,20 +31,9 @@ function SendReply(props) {
           raw: window.btoa(email).replace(/\+/g, "-").replace(/\//g, "_"),
         },
       })
-      .then((res) => console.log("Reply Message has been Sent Successfully"))
+      .then(() => console.log("Reply Message has been Sent Successfully"))
       .catch((err) => console.log(err));
   }
-  const onSubmit = (formData) => {
-    const headers_obj = {
-      To: formData.to,
-      Subject: formData.subject,
-    };
-    const message = formData.message;
-    sendMessage(headers_obj, message);
-
-    dispatch(closeSendMessage());
-    dispatch(replyButtonClicked(false));
-  };
 
   var reply_to = props?.props.title?.replace(/\"<>/g, '"');
   var reply_to_splitted = reply_to.split(" ");
@@ -51,6 +42,18 @@ function SendReply(props) {
     1,
     -1
   );
+  const [emailForReply, setEmailForReply] = useState(email_fetched);
+  const onSubmit = (formData) => {
+    const headers_obj = {
+      To: emailForReply,
+      Subject: forwardSubject,
+    };
+    const message = formData.message;
+    sendMessage(headers_obj, message);
+
+    dispatch(closeSendMessage());
+    dispatch(replyButtonClicked(false));
+  };
 
   return (
     <div className="sendMail">
@@ -67,20 +70,21 @@ function SendReply(props) {
           name="to"
           placeholder="To"
           type="email"
-          value={email_fetched}
-          {...register("to", { required: true })}
+          contentEditable={true}
+          value={emailForReply}
+          onChange={(e) => setEmailForReply(e.target.value)}
+          required
         />
-        {errors.to && <p className="sendMail-error">To is Required!</p>}
         <input
           name="subject"
           placeholder="Subject"
           type="text"
-          value={props.props.subject}
-          {...register("subject", { required: true })}
+          contentEditable={true}
+          value={forwardSubject}
+          onChange={(e) => setForwardEmailSubject(e.target.value)}
+          required
         />
-        {errors.subject && (
-          <p className="sendMail-error">Subject is Required!</p>
-        )}
+
         <input
           name="message"
           placeholder="Write the Reply Message Here!"

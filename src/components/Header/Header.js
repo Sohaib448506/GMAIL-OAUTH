@@ -15,9 +15,7 @@ function Header() {
   const dispatch = useDispatch();
 
   const signOut = () => {
-    signOut().then(() => {
-      dispatch(logout());
-    });
+    dispatch(logout());
   };
 
   return (
@@ -48,8 +46,9 @@ function Header() {
         </IconButton>
         <Avatar src={user?.photoUrl}></Avatar>
         <a
+          href="#"
           onClick={signOut}
-          style={{ "text-decoration": "underline", cursor: "pointer" }}
+          style={{ textDecoration: "underline", cursor: "pointer" }}
         >
           <h4>Sign Out</h4>
         </a>

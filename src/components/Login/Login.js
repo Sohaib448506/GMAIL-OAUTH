@@ -2,7 +2,6 @@ import { Button } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/userSlice";
-// import { auth, provider } from "../../firebase";
 import "./Login.css";
 import jwt_decode from "jwt-decode";
 
@@ -74,16 +73,6 @@ function Login() {
       await authenticate().then(loadClient);
     };
     load();
-
-    // auth.signInWithPopup(provider).then(({ user }) => {
-    //   dispatch(
-    //     login({
-    //       displayName: user.displayName,
-    //       email: user.email,
-    //       photoUrl: user.photoURL,
-    //     })
-    //   );
-    // });
   };
   return (
     <div className="login">
