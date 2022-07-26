@@ -5,9 +5,6 @@ import { Button } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { closeSendMessage } from "../../features/mailSlice";
-import { useSelector } from "react-redux";
-import { selectUser } from "../../features/userSlice";
-import axios from "axios";
 
 function SendMail() {
   const {
@@ -15,70 +12,50 @@ function SendMail() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const [imageEncode, setImageEncoded] = useState([]);
+  const [fileName, setFileName] = useState("");
   function sendMessage(headers_obj, message) {
-    var email = "";
+    const path = "upload/gmail/v1/users/me/messages/send";
+    var pngData = imageEncode;
+    var mail = [
+      'Content-Type: multipart/mixed; boundary="foo_bar_baz"\r\n',
+      "MIME-Version: 1.0\r\n",
+      `To:${headers_obj.To}\r\n`,
+      `Subject: ${headers_obj.Subject}\r\n\r\n`,
 
-    for (var header in headers_obj)
-      email += header += ": " + headers_obj[header] + "\r\n";
-    email += "\r\n" + message;
+      "--foo_bar_baz\r\n",
+      'Content-Type: text/plain; charset="UTF-8"\r\n',
+      "MIME-Version: 1.0\r\n",
+      "Content-Transfer-Encoding: 7bit\r\n\r\n",
 
-    // email += "\r\n" + imageEncode;
+      `${message}\r\n\r\n`,
 
-    var emailToSend = window
-      .btoa(email)
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
-    const path = "upload/gmail/v1/users/me/messages/send"; // Modified
-    // const mail = btoa(mails).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); // Deleted
+      "--foo_bar_baz\r\n",
+      "Content-Type: image/png\r\n",
+      "MIME-Version: 1.0\r\n",
+      "Content-Transfer-Encoding: base64\r\n",
+      `Content-Disposition: attachment; filename="${fileName}" \r\n\r\n`,
+
+      pngData,
+      "\r\n\r\n",
+
+      "--foo_bar_baz--",
+    ].join("");
+
     window.gapi.client
       .request({
         path: path,
         headers: { "Content-Type": "message/rfc822" },
         method: "POST",
-        body: mail, // Modified
+        body: mail,
       })
-      .then((response) => {
-        console.log("Response:", response);
+      .then(() => {
+        alert("Email has been sent successfully");
       })
       .catch((err) => {
         console.log("Error:", err);
       });
-
-    // axios
-    //   .post(
-    //     `https://gmail.googleapis.com/upload/gmail/v1/users/${user.user_id}/messages/send`,
-    //     {
-    //       raw: emailToSend,
-    //       attachments: [
-    //         {
-    //           name: "b2.png",
-    //           path: imageEncode[0],
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       headers: {
-    //         "Content-Type": "message/rfc822",
-    //         Authorization: `Bearer ${user.access_token}`,
-    //       },
-    //     }
-    //   )
-    //   .then((res) => console.log(res))
-    //   .catch((err) => console.log(err));
-    // window.gapi.client.gmail.users.messages
-    //   .send({
-    //     userId: "me",
-    //     resource: {
-    //       raw:
-    //         window.btoa(email).replace(/\+/g, "-").replace(/\//g, "_") +
-    //         imageEncode,
-    //     },
-    //   })
-    //   .then((res) => console.log("Message has been Sent Successfully", res))
-    //   .catch((err) => console.log(err));
   }
   const onSubmit = (formData) => {
     const headers_obj = {
@@ -90,7 +67,7 @@ function SendMail() {
 
     dispatch(closeSendMessage());
   };
-  //for attachments
+  //for attachment
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -107,45 +84,15 @@ function SendMail() {
   };
 
   const uploadImage = async (event) => {
-    const file = event.target.files[0];
+    if (event.target.files.length > 0) {
+      setFileName(event.target.files[0].name);
+      const file = event.target.files[0];
 
-    const base64 = await convertBase64(file);
+      const base64 = await convertBase64(file);
 
-    setImageEncoded(base64.split(",")[1]);
+      setImageEncoded(base64.split(",")[1]);
+    }
   };
-
-  //testing
-  // Get the canvas from the DOM and turn it into base64-encoded png data.
-  // var canvas = document.getElementById("canvas");
-  // var dataUrl = canvas.toDataURL();
-
-  // The relevant data is after 'base64,'.
-  var pngData = imageEncode;
-  var mail = [
-    'Content-Type: multipart/mixed; boundary="foo_bar_baz"\r\n',
-    "MIME-Version: 1.0\r\n",
-    "From: sender@gmail.com\r\n",
-    "To: sohaibbutt448506@gmail.com\r\n",
-    "Subject: Subject Text\r\n\r\n",
-
-    "--foo_bar_baz\r\n",
-    'Content-Type: text/plain; charset="UTF-8"\r\n',
-    "MIME-Version: 1.0\r\n",
-    "Content-Transfer-Encoding: 7bit\r\n\r\n",
-
-    "The actual message text goes here\r\n\r\n",
-
-    "--foo_bar_baz\r\n",
-    "Content-Type: image/png\r\n",
-    "MIME-Version: 1.0\r\n",
-    "Content-Transfer-Encoding: base64\r\n",
-    'Content-Disposition: attachment; filename="example.png"\r\n\r\n',
-
-    pngData,
-    "\r\n\r\n",
-
-    "--foo_bar_baz--",
-  ].join("");
 
   return (
     <div className="sendMail">
