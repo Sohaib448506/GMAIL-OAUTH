@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Mail.css";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
@@ -27,15 +27,20 @@ import SendReply from "../SendReply/SendReply";
 import { Button } from "@material-ui/core";
 
 import SendIcon from "@material-ui/icons/Send";
+
 function Mail() {
   const history = useHistory();
   const selectedMail = useSelector(selectOpenMail);
+
   const dispatch = useDispatch();
   const messageActionUpdate = useSelector(replyButtonClicked);
   const replyMessageOpen = messageActionUpdate.payload.data.replyButtonClicked;
   const forwardButtonClickedRecord = useSelector(forwardButtonClicked);
   const forwardMessageOpen =
     forwardButtonClickedRecord.payload.data.forwardButtonClicked;
+  useEffect(() => {
+    document.getElementById("textHTML").innerHTML = selectedMail?.textHTML;
+  }, [selectedMail]);
 
   return (
     <>
@@ -107,9 +112,16 @@ function Mail() {
             <p className="mail-time">{selectedMail?.time}</p>
           </div>
 
-          <div className="mail-message">
-            <p>{selectedMail?.description}</p>
+          <div className="mail-message" id="textHTML">
+            <p>Loading...</p>
           </div>
+
+          {selectedMail?.attachmentId?.length > 1 && (
+            <>
+              <h4>This mail has attachment attached with attachment ID:</h4>
+              <p>{selectedMail?.attachmentId}</p>
+            </>
+          )}
           <div className="mail-message-button">
             {" "}
             <Button

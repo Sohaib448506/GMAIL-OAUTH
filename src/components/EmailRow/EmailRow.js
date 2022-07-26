@@ -7,7 +7,16 @@ import { useHistory } from "react-router-dom";
 import { selectMail } from "../../features/mailSlice";
 import { useDispatch } from "react-redux";
 
-function EmailRow({ id, title, subject, description, time, label }) {
+function EmailRow({
+  id,
+  title,
+  subject,
+  description,
+  time,
+  label,
+  attachmentId,
+  textHTML,
+}) {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -19,6 +28,8 @@ function EmailRow({ id, title, subject, description, time, label }) {
         subject,
         description,
         time,
+        attachmentId,
+        textHTML,
       })
     );
     history.push("/mail");

@@ -14,6 +14,7 @@ import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 import Section from "../Section/Section";
 import EmailRow from "../EmailRow/EmailRow";
 import { selectUser } from "../../features/userSlice";
+import parseMessage from "gmail-api-parse-message";
 
 import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -41,6 +42,65 @@ function EmailList({ emailGathered }) {
     {
       if (emailGathered) {
         emailGathered.map((item) => {
+          // const getHTMLPart = (arr) => {
+          //   for (var x = 0; x <= arr.length; x++) {
+          //     if (typeof arr[x].parts === "undefined") {
+          //       if (arr[x].mimeType === "text/html") {
+          //         return arr[x].body.data;
+          //       }
+          //     } else {
+          //       return getHTMLPart(arr[x].parts);
+          //     }
+          //   }
+          //   return "";
+          // };
+          var parsedMessage = parseMessage(item); //To get the attachments, HTML and Plain TExt of the body
+
+          if (parsedMessage.attachments) {
+            const attachments = parsedMessage.attachments;
+            var attachmentId;
+            if (attachments.length > 1) {
+              let array = [];
+              const gathered = attachments.map((x) => {
+                array = [...array, x.attachmentId];
+                return array;
+              });
+              attachmentId = gathered;
+            } else attachmentId = parsedMessage.attachments[0].attachmentId;
+          } else {
+            var attachmentId = "";
+          }
+
+          const textHTML = parsedMessage.textHtml;
+
+          // console.log(
+          //   "Parsed message",
+          //   typeof parsedMessage.textHtml.replace(/(?:\\[rn])+/g, "")
+          // );
+
+          //  document.getElementById("sohaib").innerHTML = parsedMessage.textHtml;
+          // // console.log(
+          //   "Parsed message",
+          //   parsedMessage.textPlain.replace(/(?:\\[rn])+/g, "")
+          // );
+          // const getMessageBody = (item) => {
+          //   var encodedBody = "";
+          //   if (typeof item.payload?.parts === "undefined") {
+          //     encodedBody = item.payload.body.data;
+          //   } else {
+          //     encodedBody = getHTMLPart(item.payload.parts);
+          //   }
+
+          //   return window.atob(encodedBody);
+          // };
+
+          // var part = item.payload.parts.filter(function (part) {
+          //   return part.mimeType == "text/html";
+          // });
+
+          // var html = escape(atob(part[0]?.body?.data));
+          // var text = html.replace(/<\/?[^>]+>/gi, " ");
+
           const id = item.id;
           const message = item.snippet;
 
@@ -51,9 +111,11 @@ function EmailList({ emailGathered }) {
           });
           const subject2 = item.payload.headers.find((header) => {
             if (header.name === "Subject") {
-              return header.value;
+              if (header.value.length > 0) return header.value;
+              else return "Subject is not defined";
             }
           });
+
           const date2 = item.payload.headers.find((header) => {
             if (header.name === "Date") {
               return header.value;
@@ -73,6 +135,8 @@ function EmailList({ emailGathered }) {
               timestamp: date2.value,
             },
             label,
+            attachmentId,
+            textHTML,
           };
           if (emailGatheredDestructurying.length === 0) {
             setEmailGatheredDestructurying((pre) => [...pre, arr]);
@@ -245,7 +309,13 @@ function EmailList({ emailGathered }) {
 
       <div className="emailList-list">
         {emailGatheredDestructurying.map(
-          ({ id, data: { to, subject, description, timestamp }, label }) => (
+          ({
+            id,
+            data: { to, subject, description, timestamp },
+            label,
+            attachmentId,
+            textHTML,
+          }) => (
             <EmailRow
               id={id}
               key={id}
@@ -254,6 +324,8 @@ function EmailList({ emailGathered }) {
               description={description}
               time={timestamp}
               label={label}
+              attachmentId={attachmentId}
+              textHTML={textHTML}
             />
           )
         )}
