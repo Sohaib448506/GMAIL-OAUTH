@@ -21,6 +21,9 @@ import {
   profileSentMessages,
   profiletotalMessages,
   APIUserData,
+  profiletotalInboxMessages,
+  sentEmailFetchedDisplay,
+  displayList,
 } from "../../features/dataSlice";
 import { useEffect } from "react";
 import InboxIDs from "../api/InboxList";
@@ -48,7 +51,7 @@ function Sidebar() {
     InboxIDs(user)
       .get(`/${user.user_id}/labels/INBOX`)
       .then((res) => {
-        dispatch(profiletotalMessages(res.data.messagesTotal));
+        dispatch(profiletotalInboxMessages(res.data.messagesTotal));
         dispatch(profileData(res.data.messagesUnread));
       })
       .catch((error) => {
@@ -81,7 +84,11 @@ function Sidebar() {
           Icon={InboxIcon}
           title="Inbox"
           number={profileDataTotalUnreadMessages}
-          selected={true}
+          onClick={() => {
+            dispatch(displayList(true));
+            dispatch(sentEmailFetchedDisplay(false));
+          }}
+          selected={profileDataUpdate?.displayList}
         />
       </Link>
       <SidebarOption Icon={StarIcon} title="Starred" />
@@ -90,8 +97,14 @@ function Sidebar() {
       <SidebarOption
         Icon={NearMeIcon}
         title="Sent"
+        onClick={() => {
+          dispatch(displayList(false));
+          dispatch(sentEmailFetchedDisplay(true));
+        }}
         number={TotalSentMessages}
+        selected={profileDataUpdate.sentEmailFetchedDisplay}
       />
+
       <SidebarOption Icon={NoteIcon} title="Drafts" number={5} />
       <SidebarOption Icon={ExpandMoreIcon} title="More" />
       <div className="sidebar-footer">

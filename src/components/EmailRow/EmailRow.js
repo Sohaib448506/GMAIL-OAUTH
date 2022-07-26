@@ -5,8 +5,14 @@ import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
 import LabelImportantOutlinedIcon from "@material-ui/icons/LabelImportantOutlined";
 import { useHistory } from "react-router-dom";
 import { selectMail } from "../../features/mailSlice";
-import { useDispatch } from "react-redux";
-
+import {
+  APIUserData,
+  displayList,
+  displaySingleMessage,
+} from "../../features/dataSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Mail from "../Mail/Mail";
+import SentEmails from "../SentEmails/SentEmails";
 function EmailRow({
   id,
   title,
@@ -32,34 +38,43 @@ function EmailRow({
         textHTML,
       })
     );
-    history.push("/mail");
+    dispatch(displayList(false));
+    dispatch(displaySingleMessage(true));
+    // history.push("/mail");
   };
+  const ListRecord = useSelector(APIUserData);
 
+  const listDisplay = ListRecord.displayList;
+  const singleDisplay = ListRecord.displaySingleMessage;
   return (
     <>
-      <div onClick={openMail} className="emailRow">
-        <div className="emailRow-options">
-          <Checkbox />
-          <IconButton>
-            <StarBorderOutlinedIcon />
-          </IconButton>
-          <IconButton>
-            <LabelImportantOutlinedIcon />
-          </IconButton>
+      {listDisplay && (
+        <div onClick={openMail} className="emailRow">
+          <div className="emailRow-options">
+            <Checkbox />
+            <IconButton>
+              <StarBorderOutlinedIcon />
+            </IconButton>
+            <IconButton>
+              <LabelImportantOutlinedIcon />
+            </IconButton>
+          </div>
+          <h3 className={label ? " emailRow-title unread" : "emailRow-title"}>
+            {title}
+          </h3>
+          <div
+            className={label ? " emailRow-message unread" : "emailRow-message"}
+          >
+            <h4>
+              {subject}{" "}
+              <span className="emailRow-description"> - {description}</span>
+            </h4>
+          </div>
+          <p className="emailRow-time">{time}</p>
         </div>
-        <h3 className={label ? " emailRow-title unread" : "emailRow-title"}>
-          {title}
-        </h3>
-        <div
-          className={label ? " emailRow-message unread" : "emailRow-message"}
-        >
-          <h4>
-            {subject}{" "}
-            <span className="emailRow-description"> - {description}</span>
-          </h4>
-        </div>
-        <p className="emailRow-time">{time}</p>
-      </div>
+      )}
+      {singleDisplay && <Mail />}
+      {ListRecord.sentEmailFetchedDisplay && <SentEmails />}
     </>
   );
 }

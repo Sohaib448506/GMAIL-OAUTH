@@ -20,19 +20,22 @@ import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
 import InboxIDs from "../../components/api/InboxList";
 
-function EmailList({ emailGathered }) {
+function EmailList() {
   const [emailGatheredDestructurying, setEmailGatheredDestructurying] =
     useState([]);
 
   const user = useSelector(selectUser);
   const data = useSelector(APIUserData);
-  console.log("🚀 ~ file: EmailList.js ~ line 29 ~ EmailList ~ data", data);
 
+  const emailGathered = data.emailData.emailGathered;
   const dispatch = useDispatch();
-  const [load, setLoad] = useState(false);
-  const [nextPageIcon, setNextPageIcon] = useState(false);
-  const [prevPageIcon, setPrevPageIcon] = useState(true);
 
+  const [nextPageIcon, setNextPageIcon] = useState(false);
+
+  const [prevPageIcon, setPrevPageIcon] = useState(true);
+  const [resultLoaded, setResultLoaded] = useState(2);
+
+  const totalMessagesOfInbox = data.profiletotalInboxMessages;
   var nextPageToken = data.data?.nextPageToken;
 
   const [newEmailListIDs, setNewEmailListIDs] = useState([]);
@@ -43,18 +46,6 @@ function EmailList({ emailGathered }) {
     {
       if (emailGathered) {
         emailGathered.map((item) => {
-          // const getHTMLPart = (arr) => {
-          //   for (var x = 0; x <= arr.length; x++) {
-          //     if (typeof arr[x].parts === "undefined") {
-          //       if (arr[x].mimeType === "text/html") {
-          //         return arr[x].body.data;
-          //       }
-          //     } else {
-          //       return getHTMLPart(arr[x].parts);
-          //     }
-          //   }
-          //   return "";
-          // };
           var parsedMessage = parseMessage(item); //To get the attachments, HTML and Plain TExt of the body
 
           if (parsedMessage.attachments) {
@@ -73,34 +64,6 @@ function EmailList({ emailGathered }) {
           }
 
           const textHTML = parsedMessage.textHtml;
-
-          // console.log(
-          //   "Parsed message",
-          //   typeof parsedMessage.textHtml.replace(/(?:\\[rn])+/g, "")
-          // );
-
-          //  document.getElementById("sohaib").innerHTML = parsedMessage.textHtml;
-          // // console.log(
-          //   "Parsed message",
-          //   parsedMessage.textPlain.replace(/(?:\\[rn])+/g, "")
-          // );
-          // const getMessageBody = (item) => {
-          //   var encodedBody = "";
-          //   if (typeof item.payload?.parts === "undefined") {
-          //     encodedBody = item.payload.body.data;
-          //   } else {
-          //     encodedBody = getHTMLPart(item.payload.parts);
-          //   }
-
-          //   return window.atob(encodedBody);
-          // };
-
-          // var part = item.payload.parts.filter(function (part) {
-          //   return part.mimeType == "text/html";
-          // });
-
-          // var html = escape(atob(part[0]?.body?.data));
-          // var text = html.replace(/<\/?[^>]+>/gi, " ");
 
           const id = item.id;
           const message = item.snippet;
@@ -158,23 +121,30 @@ function EmailList({ emailGathered }) {
   }, [emailGathered]);
 
   const nextPage = () => {
-    if (nextPageToken) {
+    const difference = totalMessagesOfInbox - 2 - resultLoaded;
+
+    if (difference < 1) {
+      setNextPageIcon(true);
+    } else {
+      setNextPageIcon(false);
+      setPrevPageIcon(false);
+    }
+    if (resultLoaded <= totalMessagesOfInbox) {
+      if (totalMessagesOfInbox - resultLoaded - 2 > 0) {
+        setPreArray((pre) => [...pre, nextPageToken]);
+      }
+      setResultLoaded((x) => x + 2);
+
       InboxIDs(user)
         .get(
           `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${nextPageToken}&q=category%3Aprimary`
         )
         .then((res) => {
-          if (!res.data.nextPageToken) {
-            setNextPageIcon(true);
-          }
-          setPrevPageIcon(false);
-
-          if (res.data?.resultSizeEstimate > 0) {
-            setPreArray((pre) => [...pre, nextPageToken]);
+          {
             setEmailGatheredDestructurying([]);
             dispatch(userData(res.data));
             setNewEmailListIDs(res.data.messages);
-          } else setNextPageIcon(true);
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -183,30 +153,26 @@ function EmailList({ emailGathered }) {
   };
 
   const prevPage = () => {
+    setNextPageIcon(false);
     const preArraylength = preArray.length;
 
     if (preArraylength > 0) {
-      const thisPageToken = preArray.pop(); //Just for next use
-      nextPageToken = preArray.pop();
-      prePageApIData(nextPageToken);
-      setNextPageIcon(false);
-    }
-    if (preArraylength === 0) {
+      const prevPageToken = preArray.pop(); //Just for next use
+      setResultLoaded((x) => x - 2);
+
+      prePageApIData(prevPageToken);
+    } else {
       setPrevPageIcon(true);
+      preArray.pop();
+      setResultLoaded((x) => x - 2);
       InboxIDs(user)
         .get(`/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken`)
         .then((res) => {
-          // if (!res.data.nextPageToken) {
-          //   setNextPageIcon(true);
-          // }
-
-          if (res.data?.resultSizeEstimate > 0) {
-            // setPreArray((pre) => [...pre, nextPageToken]);
+          {
             setEmailGatheredDestructurying([]);
             dispatch(userData(res.data));
             setNewEmailListIDs(res.data.messages);
           }
-          //  else setNextPageIcon(true);
         })
         .catch((error) => {
           console.error(error);
@@ -219,13 +185,11 @@ function EmailList({ emailGathered }) {
         `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${token}&q=category%3Aprimary`
       )
       .then((res) => {
-        if (res.data?.resultSizeEstimate > 0) {
-          // setPreArray((pre) => [...pre, nextPageToken]);
+        {
           setEmailGatheredDestructurying([]);
           dispatch(userData(res.data));
           setNewEmailListIDs(res.data.messages);
         }
-        //  else setNextPageIcon(true);
       })
       .catch((error) => {
         console.error(error);
@@ -254,7 +218,7 @@ function EmailList({ emailGathered }) {
     }
   }, [newEmailListIDs]);
   useEffect(() => {
-    if (load) {
+    {
       const emailGathered = newEmailGathered;
       dispatch(displayEmails({ emailGathered }));
     }
@@ -279,7 +243,6 @@ function EmailList({ emailGathered }) {
           <IconButton
             onClick={() => {
               prevPage();
-              setLoad(true);
             }}
             disabled={prevPageIcon}
           >
@@ -287,7 +250,6 @@ function EmailList({ emailGathered }) {
           </IconButton>
           <IconButton
             onClick={() => {
-              setLoad(true);
               nextPage();
             }}
             disabled={nextPageIcon}
@@ -302,11 +264,14 @@ function EmailList({ emailGathered }) {
           </IconButton>
         </div>
       </div>
-      <div className="emailList-sections">
-        <Section Icon={InboxIcon} title="Primary" color="red" selected />
-        <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
-        <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
-      </div>
+
+      {data.displayList && (
+        <div className="emailList-sections">
+          <Section Icon={InboxIcon} title="Primary" color="red" selected />
+          <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
+          <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
+        </div>
+      )}
 
       <div className="emailList-list">
         {emailGatheredDestructurying.map(

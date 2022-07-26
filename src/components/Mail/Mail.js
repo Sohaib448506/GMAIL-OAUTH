@@ -21,8 +21,11 @@ import {
   clickRecord,
   replyButtonClicked,
   forwardButtonClicked,
+  APIUserData,
+  displayList,
+  displaySingleMessage,
 } from "../../features/dataSlice";
-// import { Button } from "@material-ui/Button";
+
 import SendReply from "../SendReply/SendReply";
 import { Button } from "@material-ui/core";
 
@@ -41,6 +44,7 @@ function Mail() {
   useEffect(() => {
     document.getElementById("textHTML").innerHTML = selectedMail?.textHTML;
   }, [selectedMail]);
+  const ListRecord = useSelector(APIUserData);
 
   return (
     <>
@@ -49,7 +53,9 @@ function Mail() {
           <div className="mail-toolsLeft">
             <IconButton
               onClick={() => {
-                history.push("/");
+                //history.push("/");
+                dispatch(displayList(true));
+                dispatch(displaySingleMessage(false));
                 dispatch(clickRecord(false));
               }}
             >

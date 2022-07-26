@@ -12,6 +12,10 @@ export const APISlice = createSlice({
     profileSentMessages: 0,
     profiletotalMessages: 0,
     profiletotalInboxMessages: 0,
+    displayList: true,
+    displaySingleMessage: false,
+    sentEmailFetchedDone: [],
+    sentEmailFetchedDisplay: false,
   },
   reducers: {
     userData: (state, action) => {
@@ -42,7 +46,19 @@ export const APISlice = createSlice({
       state.profiletotalMessages = action.payload;
     },
     profiletotalInboxMessages: (state, action) => {
-      state.profiletotalMessages = action.payload;
+      state.profiletotalInboxMessages = action.payload;
+    },
+    displayList: (state, action) => {
+      state.displayList = action.payload;
+    },
+    displaySingleMessage: (state, action) => {
+      state.displaySingleMessage = action.payload;
+    },
+    sentEmailFetchedDone: (state, action) => {
+      state.sentEmailFetchedDone = action.payload;
+    },
+    sentEmailFetchedDisplay: (state, action) => {
+      state.sentEmailFetchedDisplay = action.payload;
     },
   },
 });
@@ -58,6 +74,10 @@ export const {
   profileSentMessages,
   profiletotalMessages,
   profiletotalInboxMessages,
+  displayList,
+  displaySingleMessage,
+  sentEmailFetchedDone,
+  sentEmailFetchedDisplay,
 } = APISlice.actions;
 
 export const APIUserData = (state) => state.data;
