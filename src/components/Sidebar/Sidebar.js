@@ -20,22 +20,20 @@ import {
   profileData,
   profileSentMessages,
   profiletotalMessages,
+  APIUserData,
 } from "../../features/dataSlice";
 import { useEffect } from "react";
 import InboxIDs from "../api/InboxList";
 
-function Sidebar({ emails }) {
+function Sidebar() {
   const dispatch = useDispatch();
-  const profileDataUpdate = useSelector(profileData);
-  const user = useSelector(selectUser);
-  const profileDataTotalUnreadMessages =
-    profileDataUpdate.payload.data.profileData;
-  const profileDataTotalSentMessages = useSelector(profileSentMessages);
-  const TotalSentMessages =
-    profileDataTotalSentMessages.payload.data.profileSentMessages;
-  const userTotalMessages = useSelector(profiletotalMessages);
+  const profileDataUpdate = useSelector(APIUserData);
 
-  const totalMessages = userTotalMessages.payload.data.profiletotalMessages;
+  const user = useSelector(selectUser);
+  const profileDataTotalUnreadMessages = profileDataUpdate.profileData;
+  const TotalSentMessages = profileDataUpdate.profileSentMessages;
+  const totalMessages = profileDataUpdate.profiletotalMessages;
+
   useEffect(() => {
     //for getting total Messages
     InboxIDs(user)
@@ -46,10 +44,11 @@ function Sidebar({ emails }) {
       .catch((error) => {
         console.error(error);
       });
-    // for getting theunread messages
+    // for getting the unread messages
     InboxIDs(user)
       .get(`/${user.user_id}/labels/INBOX`)
       .then((res) => {
+        dispatch(profiletotalMessages(res.data.messagesTotal));
         dispatch(profileData(res.data.messagesUnread));
       })
       .catch((error) => {

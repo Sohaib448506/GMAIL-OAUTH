@@ -29,7 +29,9 @@ function App() {
   useEffect(() => {
     if (user) {
       InboxIDs(user)
-        .get(`/${user.user_id}/messages?labelIds=INBOX&maxResults=2`)
+        .get(
+          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&q=category%3Aprimary`
+        )
         .then((res) => {
           dispatch(userData(res.data));
           setEmailListIDs(res.data.messages);
@@ -68,7 +70,7 @@ function App() {
         <div className="app">
           <Header />
           <div className="app-body">
-            <Sidebar emails={emailsToDisplay} />
+            <Sidebar />
             <Switch>
               <Route path="/mail">
                 <Mail />

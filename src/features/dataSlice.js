@@ -11,6 +11,7 @@ export const APISlice = createSlice({
     profileData: 0,
     profileSentMessages: 0,
     profiletotalMessages: 0,
+    profiletotalInboxMessages: 0,
   },
   reducers: {
     userData: (state, action) => {
@@ -40,6 +41,9 @@ export const APISlice = createSlice({
     profiletotalMessages: (state, action) => {
       state.profiletotalMessages = action.payload;
     },
+    profiletotalInboxMessages: (state, action) => {
+      state.profiletotalMessages = action.payload;
+    },
   },
 });
 
@@ -53,6 +57,7 @@ export const {
   profileData,
   profileSentMessages,
   profiletotalMessages,
+  profiletotalInboxMessages,
 } = APISlice.actions;
 
 export const APIUserData = (state) => state.data;

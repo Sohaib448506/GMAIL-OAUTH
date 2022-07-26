@@ -26,6 +26,7 @@ function EmailList({ emailGathered }) {
 
   const user = useSelector(selectUser);
   const data = useSelector(APIUserData);
+  console.log("🚀 ~ file: EmailList.js ~ line 29 ~ EmailList ~ data", data);
 
   const dispatch = useDispatch();
   const [load, setLoad] = useState(false);
@@ -160,7 +161,7 @@ function EmailList({ emailGathered }) {
     if (nextPageToken) {
       InboxIDs(user)
         .get(
-          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${nextPageToken}`
+          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${nextPageToken}&q=category%3Aprimary`
         )
         .then((res) => {
           if (!res.data.nextPageToken) {
@@ -215,7 +216,7 @@ function EmailList({ emailGathered }) {
   const prePageApIData = (token) => {
     InboxIDs(user)
       .get(
-        `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${token}`
+        `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${token}&q=category%3Aprimary`
       )
       .then((res) => {
         if (res.data?.resultSizeEstimate > 0) {

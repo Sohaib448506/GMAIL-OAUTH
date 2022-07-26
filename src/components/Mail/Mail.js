@@ -111,17 +111,6 @@ function Mail() {
             <p>{selectedMail?.title}</p>
             <p className="mail-time">{selectedMail?.time}</p>
           </div>
-
-          <div className="mail-message" id="textHTML">
-            <p>Loading...</p>
-          </div>
-
-          {selectedMail?.attachmentId?.length > 1 && (
-            <>
-              <h4>This mail has attachment attached with attachment ID:</h4>
-              <p>{selectedMail?.attachmentId}</p>
-            </>
-          )}
           <div className="mail-message-button">
             {" "}
             <Button
@@ -143,6 +132,16 @@ function Mail() {
               Forward
             </Button>
           </div>
+          <div className="mail-message" id="textHTML">
+            <p>Loading...</p>
+          </div>
+
+          {selectedMail?.attachmentId?.length > 1 && (
+            <>
+              <h4>This mail has attachment attached with attachment ID:</h4>
+              <p>{selectedMail?.attachmentId}</p>
+            </>
+          )}
         </div>
       </div>
       {replyMessageOpen && <SendReply props={selectedMail} />}
