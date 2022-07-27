@@ -73,7 +73,6 @@ function EmailRow({
           <p className="emailRow-time">{time}</p>
         </div>
       )}
-      {singleDisplay && <Mail />}
     </>
   );
 }

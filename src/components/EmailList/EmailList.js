@@ -228,7 +228,7 @@ function EmailList() {
 
   return (
     <>
-      {!data.sentEmailFetchedDisplay && (
+      {!data.displaySingleMessage && !data.sentEmailFetchedDisplay && (
         <div className="emailList">
           <div className="emailList-settings">
             <div className="emailList-settingsLeft">

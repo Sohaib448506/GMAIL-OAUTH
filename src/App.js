@@ -9,6 +9,7 @@ import {
   userData,
   displayEmails,
   sentEmailFetchedDone,
+  APIUserData,
 } from "./features/dataSlice";
 
 import Header from "./components/Header/Header";
@@ -18,6 +19,7 @@ import SendMail from "./components/SendMail/SendMail";
 import Login from "./components/Login/Login";
 import InboxIDs from "./components/api/InboxList";
 import SentEmails from "./components/SentEmails/SentEmails";
+import Mail from "./components/Mail/Mail";
 
 function App() {
   const user = useSelector(selectUser);
@@ -27,6 +29,9 @@ function App() {
   const [emailListIDs, setEmailListIDs] = useState([]);
   const [emailGathered, setEmailGathered] = useState([]);
   const [sentEmailFetched, setSentEmailFetched] = useState([]);
+
+  const ListRecord = useSelector(APIUserData);
+  const singleDisplay = ListRecord.displaySingleMessage;
 
   useEffect(() => {
     dispatch(sentEmailFetchedDone(sentEmailFetched));
@@ -106,6 +111,7 @@ function App() {
           <div className="app-body">
             <Sidebar />
             <SentEmails />
+            {singleDisplay && <Mail />}
             <Switch>
               <Route path="/" exact>
                 <EmailList />
