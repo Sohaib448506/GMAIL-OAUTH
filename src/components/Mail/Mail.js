@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import "./Mail.css";
+
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import MoveToInboxIcon from "@material-ui/icons/MoveToInbox";
 import ErrorIcon from "@material-ui/icons/Error";
@@ -13,38 +14,35 @@ import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
 import PrintIcon from "@material-ui/icons/Print";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { IconButton } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { Button } from "@material-ui/core";
+import SendIcon from "@material-ui/icons/Send";
+
 import { selectOpenMail } from "../../features/mailSlice";
 import { useSelector, useDispatch } from "react-redux";
-import ForwardMessage from "../ForwardMessage/ForwardsMessage";
+
 import {
   clickRecord,
   replyButtonClicked,
   forwardButtonClicked,
-  APIUserData,
   displayList,
   displaySingleMessage,
+  APIUserData,
 } from "../../features/dataSlice";
-
+import ForwardMessage from "../ForwardMessage/ForwardsMessage";
 import SendReply from "../SendReply/SendReply";
-import { Button } from "@material-ui/core";
-
-import SendIcon from "@material-ui/icons/Send";
 
 function Mail() {
-  const history = useHistory();
   const selectedMail = useSelector(selectOpenMail);
+  const messageActionUpdate = useSelector(APIUserData);
+
+  const replyMessageOpen = messageActionUpdate.replyButtonClicked;
+  const forwardMessageOpen = messageActionUpdate.forwardButtonClicked;
 
   const dispatch = useDispatch();
-  const messageActionUpdate = useSelector(replyButtonClicked);
-  const replyMessageOpen = messageActionUpdate.payload.data.replyButtonClicked;
-  const forwardButtonClickedRecord = useSelector(forwardButtonClicked);
-  const forwardMessageOpen =
-    forwardButtonClickedRecord.payload.data.forwardButtonClicked;
+
   useEffect(() => {
     document.getElementById("textHTML").innerHTML = selectedMail?.textHTML;
   }, [selectedMail]);
-  const ListRecord = useSelector(APIUserData);
 
   return (
     <>
@@ -53,10 +51,11 @@ function Mail() {
           <div className="mail-toolsLeft">
             <IconButton
               onClick={() => {
-                //history.push("/");
                 dispatch(displayList(true));
                 dispatch(displaySingleMessage(false));
                 dispatch(clickRecord(false));
+                dispatch(forwardButtonClicked(false));
+                dispatch(replyButtonClicked(false));
               }}
             >
               <ArrowBackIcon />

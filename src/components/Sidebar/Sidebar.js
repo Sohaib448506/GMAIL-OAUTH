@@ -1,5 +1,8 @@
-import { Button, IconButton } from "@material-ui/core";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./Sidebar.css";
+
+import { Button, IconButton } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import InboxIcon from "@material-ui/icons/Inbox";
 import StarIcon from "@material-ui/icons/Star";
@@ -11,8 +14,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import PersonIcon from "@material-ui/icons/Person";
 import DuoIcon from "@material-ui/icons/Duo";
 import PhoneIcon from "@material-ui/icons/Phone";
-import SidebarOption from "./SidebarOption";
-import { Link } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../features/userSlice";
 import { openSendMessage } from "../../features/mailSlice";
@@ -24,9 +26,13 @@ import {
   profiletotalInboxMessages,
   sentEmailFetchedDisplay,
   displayList,
+  displaySingleMessage,
+  replyButtonClicked,
+  forwardButtonClicked,
 } from "../../features/dataSlice";
-import { useEffect } from "react";
+
 import InboxIDs from "../api/InboxList";
+import SidebarOption from "./SidebarOption";
 
 function Sidebar() {
   const dispatch = useDispatch();
@@ -34,6 +40,7 @@ function Sidebar() {
 
   const user = useSelector(selectUser);
   const profileDataTotalUnreadMessages = profileDataUpdate.profileData;
+
   const TotalSentMessages = profileDataUpdate.profileSentMessages;
   const totalMessages = profileDataUpdate.profiletotalMessages;
 
@@ -87,6 +94,9 @@ function Sidebar() {
           onClick={() => {
             dispatch(displayList(true));
             dispatch(sentEmailFetchedDisplay(false));
+            dispatch(displaySingleMessage(false));
+            dispatch(forwardButtonClicked(false));
+            dispatch(replyButtonClicked(false));
           }}
           selected={profileDataUpdate?.displayList}
         />
@@ -100,6 +110,7 @@ function Sidebar() {
         onClick={() => {
           dispatch(displayList(false));
           dispatch(sentEmailFetchedDisplay(true));
+          dispatch(displaySingleMessage(false));
         }}
         number={TotalSentMessages}
         selected={profileDataUpdate.sentEmailFetchedDisplay}

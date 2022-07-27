@@ -1,30 +1,64 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
-import Header from "./components/Header/Header";
-import Sidebar from "./components/Sidebar/Sidebar";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Mail from "./components/Mail/Mail";
-import EmailList from "./components/EmailList/EmailList";
-import SendMail from "./components/SendMail/SendMail";
+import "./App.css";
+
 import { useSelector, useDispatch } from "react-redux";
 import { selectSendMessageIsOpen } from "./features/mailSlice";
 import { selectUser } from "./features/userSlice";
+import {
+  userData,
+  displayEmails,
+  sentEmailFetchedDone,
+} from "./features/dataSlice";
+
+import Header from "./components/Header/Header";
+import Sidebar from "./components/Sidebar/Sidebar";
+import EmailList from "./components/EmailList/EmailList";
+import SendMail from "./components/SendMail/SendMail";
 import Login from "./components/Login/Login";
 import InboxIDs from "./components/api/InboxList";
-import { userData, displayEmails } from "./features/dataSlice";
+import SentEmails from "./components/SentEmails/SentEmails";
 
 function App() {
-  const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
   const user = useSelector(selectUser);
-  const Emails = useSelector(displayEmails);
-
-  const emailsToDisplay = Emails.payload.data.emailData?.emailGathered;
-
   const dispatch = useDispatch();
+  const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
 
   const [emailListIDs, setEmailListIDs] = useState([]);
-
   const [emailGathered, setEmailGathered] = useState([]);
+  const [sentEmailFetched, setSentEmailFetched] = useState([]);
+
+  useEffect(() => {
+    dispatch(sentEmailFetchedDone(sentEmailFetched));
+  }, [sentEmailFetched]);
+
+  useEffect(() => {
+    if (user) {
+      InboxIDs(user)
+        .get(`/${user.user_id}/messages?labelIds=SENT`)
+
+        .then(
+          function (response) {
+            response.data.messages.map(async (item) => {
+              await InboxIDs(user)
+                .get(`/${user.user_id}/messages/${item.id}`)
+                .then((res) => {
+                  setSentEmailFetched((sentEmailFetched) => [
+                    ...sentEmailFetched,
+                    res.data,
+                  ]);
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            });
+          },
+          function (err) {
+            console.error("Execute error", err);
+          }
+        );
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -56,7 +90,7 @@ function App() {
           })
       );
 
-      return () => {}; //console.log("my effect is destroying");
+      return () => {};
     }
   }, [emailListIDs]);
   useEffect(() => {
@@ -71,12 +105,10 @@ function App() {
           <Header />
           <div className="app-body">
             <Sidebar />
+            <SentEmails />
             <Switch>
-              <Route path="/mail">
-                <Mail />
-              </Route>
               <Route path="/" exact>
-                <EmailList emailGathered={emailsToDisplay} />
+                <EmailList />
               </Route>
             </Switch>
           </div>

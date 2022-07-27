@@ -1,9 +1,10 @@
-import { Checkbox, IconButton } from "@material-ui/core";
 import React from "react";
 import "./EmailRow.css";
+
+import { Checkbox, IconButton } from "@material-ui/core";
 import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
 import LabelImportantOutlinedIcon from "@material-ui/icons/LabelImportantOutlined";
-import { useHistory } from "react-router-dom";
+
 import { selectMail } from "../../features/mailSlice";
 import {
   APIUserData,
@@ -11,8 +12,9 @@ import {
   displaySingleMessage,
 } from "../../features/dataSlice";
 import { useDispatch, useSelector } from "react-redux";
+
 import Mail from "../Mail/Mail";
-import SentEmails from "../SentEmails/SentEmails";
+
 function EmailRow({
   id,
   title,
@@ -23,7 +25,6 @@ function EmailRow({
   attachmentId,
   textHTML,
 }) {
-  const history = useHistory();
   const dispatch = useDispatch();
 
   const openMail = () => {
@@ -40,7 +41,6 @@ function EmailRow({
     );
     dispatch(displayList(false));
     dispatch(displaySingleMessage(true));
-    // history.push("/mail");
   };
   const ListRecord = useSelector(APIUserData);
 
@@ -74,7 +74,6 @@ function EmailRow({
         </div>
       )}
       {singleDisplay && <Mail />}
-      {ListRecord.sentEmailFetchedDisplay && <SentEmails />}
     </>
   );
 }

@@ -1,6 +1,7 @@
-import { Checkbox, IconButton } from "@material-ui/core";
 import React, { useState, useMemo, useEffect } from "react";
 import "./EmailList.css";
+
+import { Checkbox, IconButton } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import RedoIcon from "@material-ui/icons/Redo";
@@ -11,36 +12,37 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import InboxIcon from "@material-ui/icons/Inbox";
 import PeopleIcon from "@material-ui/icons/People";
 import LocalOfferIcon from "@material-ui/icons/LocalOffer";
-import Section from "../Section/Section";
-import EmailRow from "../EmailRow/EmailRow";
-import { selectUser } from "../../features/userSlice";
-import parseMessage from "gmail-api-parse-message";
 
 import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { selectUser } from "../../features/userSlice";
+
 import InboxIDs from "../../components/api/InboxList";
+import Section from "../Section/Section";
+import EmailRow from "../EmailRow/EmailRow";
+
+import parseMessage from "gmail-api-parse-message";
 
 function EmailList() {
-  const [emailGatheredDestructurying, setEmailGatheredDestructurying] =
-    useState([]);
-
   const user = useSelector(selectUser);
   const data = useSelector(APIUserData);
 
   const emailGathered = data.emailData.emailGathered;
+  const totalMessagesOfInbox = data.profiletotalInboxMessages;
+
   const dispatch = useDispatch();
 
   const [nextPageIcon, setNextPageIcon] = useState(false);
-
   const [prevPageIcon, setPrevPageIcon] = useState(true);
   const [resultLoaded, setResultLoaded] = useState(2);
-
-  const totalMessagesOfInbox = data.profiletotalInboxMessages;
-  var nextPageToken = data.data?.nextPageToken;
 
   const [newEmailListIDs, setNewEmailListIDs] = useState([]);
   const [newEmailGathered, setNewEmailGathered] = useState([]);
   const [preArray, setPreArray] = useState([]);
+  const [emailGatheredDestructurying, setEmailGatheredDestructurying] =
+    useState([]);
+
+  var nextPageToken = data.data?.nextPageToken;
 
   useMemo(() => {
     {
@@ -60,7 +62,7 @@ function EmailList() {
               attachmentId = gathered;
             } else attachmentId = parsedMessage.attachments[0].attachmentId;
           } else {
-            var attachmentId = "";
+            attachmentId = "";
           }
 
           const textHTML = parsedMessage.textHtml;
@@ -225,95 +227,82 @@ function EmailList() {
   }, [newEmailGathered]);
 
   return (
-    <div className="emailList">
-      <div className="emailList-settings">
-        <div className="emailList-settingsLeft">
-          <Checkbox />
-          <IconButton>
-            <ArrowDropDownIcon />
-          </IconButton>
-          <IconButton>
-            <RedoIcon />
-          </IconButton>
-          <IconButton>
-            <MoreVertIcon />
-          </IconButton>
-        </div>
-        <div className="emailList-settingsRight">
-          <IconButton
-            onClick={() => {
-              prevPage();
-            }}
-            disabled={prevPageIcon}
-          >
-            <ChevronLeftIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              nextPage();
-            }}
-            disabled={nextPageIcon}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-          <IconButton>
-            <KeyboardHideIcon />
-          </IconButton>
-          <IconButton>
-            <SettingsIcon />
-          </IconButton>
-        </div>
-      </div>
+    <>
+      {!data.sentEmailFetchedDisplay && (
+        <div className="emailList">
+          <div className="emailList-settings">
+            <div className="emailList-settingsLeft">
+              <Checkbox />
+              <IconButton>
+                <ArrowDropDownIcon />
+              </IconButton>
+              <IconButton>
+                <RedoIcon />
+              </IconButton>
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            </div>
+            <div className="emailList-settingsRight">
+              <IconButton
+                onClick={() => {
+                  prevPage();
+                }}
+                disabled={prevPageIcon}
+              >
+                <ChevronLeftIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => {
+                  nextPage();
+                }}
+                disabled={nextPageIcon}
+              >
+                <ChevronRightIcon />
+              </IconButton>
+              <IconButton>
+                <KeyboardHideIcon />
+              </IconButton>
+              <IconButton>
+                <SettingsIcon />
+              </IconButton>
+            </div>
+          </div>
 
-      {data.displayList && (
-        <div className="emailList-sections">
-          <Section Icon={InboxIcon} title="Primary" color="red" selected />
-          <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
-          <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
+          {data.displayList && (
+            <div className="emailList-sections">
+              <Section Icon={InboxIcon} title="Primary" color="red" selected />
+              <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
+              <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
+            </div>
+          )}
+
+          <div className="emailList-list">
+            {emailGatheredDestructurying.map(
+              ({
+                id,
+                data: { to, subject, description, timestamp },
+                label,
+                attachmentId,
+                textHTML,
+              }) => (
+                <EmailRow
+                  id={id}
+                  key={id}
+                  title={to}
+                  subject={subject}
+                  description={description}
+                  time={timestamp}
+                  label={label}
+                  attachmentId={attachmentId}
+                  textHTML={textHTML}
+                />
+              )
+            )}
+          </div>
         </div>
       )}
-
-      <div className="emailList-list">
-        {emailGatheredDestructurying.map(
-          ({
-            id,
-            data: { to, subject, description, timestamp },
-            label,
-            attachmentId,
-            textHTML,
-          }) => (
-            <EmailRow
-              id={id}
-              key={id}
-              title={to}
-              subject={subject}
-              description={description}
-              time={timestamp}
-              label={label}
-              attachmentId={attachmentId}
-              textHTML={textHTML}
-            />
-          )
-        )}
-
-        {/* {emails.map(({ id, data: { to, subject, message, timestamp } }) => (
-          <EmailRow
-            id={id}
-            key={id}
-            title={to}
-            subject={subject}
-            description={message}
-            time={new Date(timestamp?.seconds * 1000).toUTCString()}
-          />
-        ))} */}
-        {/* <EmailRow
-          title="Twitch"
-          subject="Hey fellow streamer!!"
-          description="This is a DOPE"
-          time="10pm"
-        /> */}
-      </div>
-    </div>
+    </>
   );
 }
 

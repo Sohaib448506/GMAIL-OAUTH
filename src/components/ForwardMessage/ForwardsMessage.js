@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
 import CloseIcon from "@material-ui/icons/Close";
 import { Button } from "@material-ui/core";
-import { useForm } from "react-hook-form";
+
 import { useDispatch } from "react-redux";
 import { closeSendMessage } from "../../features/mailSlice";
 import { forwardButtonClicked } from "../../features/dataSlice";

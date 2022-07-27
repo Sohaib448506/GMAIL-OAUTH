@@ -1,33 +1,37 @@
-import React, { useEffect, useMemo, useState } from "react";
-import InboxIDs from "../api/InboxList";
-import { selectUser } from "../../features/userSlice";
-import { sentEmailFetchedDone, APIUserData } from "../../features/dataSlice";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useMemo, useState } from "react";
+
+import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
+import SettingsIcon from "@material-ui/icons/Settings";
+import InboxIcon from "@material-ui/icons/Inbox";
+import PeopleIcon from "@material-ui/icons/People";
+import LocalOfferIcon from "@material-ui/icons/LocalOffer";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import RedoIcon from "@material-ui/icons/Redo";
+
+import { APIUserData } from "../../features/dataSlice";
+import { useSelector } from "react-redux";
+
+import Section from "../Section/Section";
+import SingleEmailDisplaySent from "./SingleEmailDisplaySent";
 
 import parseMessage from "gmail-api-parse-message";
-import SingleEmailDisplaySent from "./SingleEmailDisplaySent";
+
+import { Checkbox, IconButton } from "@material-ui/core";
 const SentEmails = () => {
-  const user = useSelector(selectUser);
   const [sentEmail, SetSentEmail] = useState([]);
-
-  const [sentEmailFetched, setSentEmailFetched] = useState([]);
-  const dispatch = useDispatch();
   const sentEmailsToDisplay = useSelector(APIUserData);
+  const sentEmailDependencyArray = sentEmailsToDisplay.sentEmailFetchedDone;
 
-  useEffect(() => {
-    dispatch(sentEmailFetchedDone(sentEmail));
-  }, [sentEmail]);
-
-  useEffect(() => {
-    if (sentEmailFetched.length > 0) {
-      sentEmailFetched.map((item) => {
+  useMemo(() => {
+    if (sentEmailDependencyArray.length > 0) {
+      sentEmailDependencyArray.map((item) => {
         var parsedMessage = parseMessage(item);
-
         const condition = sentEmail.find((array) => array.id === item.id);
-
         if (condition) {
           return sentEmail;
         } else {
+          ///Re structuring the API Fetched Data to pass to component to display it.
           const arr = {
             id: parsedMessage.id,
             to: parsedMessage.headers.to,
@@ -35,58 +39,62 @@ const SentEmails = () => {
             description: parsedMessage.snippet,
             timestamp: parsedMessage.headers.date,
           };
-
-          SetSentEmail((sentEmail) => [...sentEmail, arr]);
-          return;
+          return SetSentEmail((sentEmail) => [...sentEmail, arr]);
         }
       });
     }
-  }, [sentEmailFetched]);
-
-  useEffect(() => {
-    InboxIDs(user)
-      .get(`/${user.user_id}/messages?labelIds=SENT`)
-
-      .then(
-        function (response) {
-          response.data.messages.map(async (item) => {
-            await InboxIDs(user)
-              .get(`/${user.user_id}/messages/${item.id}`)
-              .then((res) => {
-                setSentEmailFetched((sentEmailFetched) => [
-                  ...sentEmailFetched,
-                  res.data,
-                ]);
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          });
-        },
-        function (err) {
-          console.error("Execute error", err);
-        }
-      );
-  }, [user]);
+  }, [sentEmailDependencyArray]);
 
   return (
     <>
-      {" "}
-      <div className="emailList-list">
-        {sentEmailsToDisplay.sentEmailFetchedDisplay &&
-          sentEmailsToDisplay.sentEmailFetchedDone.map(
-            ({ id, to, subject, description, timestamp }) => (
-              <SingleEmailDisplaySent
-                key={id}
-                id={id}
-                to={to}
-                subject={subject}
-                description={description}
-                timestamp={timestamp}
-              />
-            )
+      {sentEmailsToDisplay.sentEmailFetchedDisplay && (
+        <div className="emailList">
+          <div className="emailList-settings">
+            <div className="emailList-settingsLeft">
+              <Checkbox />
+              <IconButton>
+                <ArrowDropDownIcon />
+              </IconButton>
+              <IconButton>
+                <RedoIcon />
+              </IconButton>
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            </div>
+            <div className="emailList-settingsRight">
+              <IconButton>
+                <KeyboardHideIcon />
+              </IconButton>
+              <IconButton>
+                <SettingsIcon />
+              </IconButton>
+            </div>
+          </div>
+
+          {sentEmailsToDisplay.sentEmailFetchedDisplay && (
+            <div className="emailList-sections">
+              <Section Icon={InboxIcon} title="Primary" color="red" selected />
+              <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
+              <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
+            </div>
           )}
-      </div>
+
+          <div className="emailList-list">
+            {sentEmailsToDisplay.sentEmailFetchedDisplay &&
+              sentEmail.map(({ id, to, subject, description, timestamp }) => (
+                <SingleEmailDisplaySent
+                  key={id}
+                  id={id}
+                  to={to}
+                  subject={subject}
+                  description={description}
+                  timestamp={timestamp}
+                />
+              ))}
+          </div>
+        </div>
+      )}
     </>
   );
 };
