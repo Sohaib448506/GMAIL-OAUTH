@@ -116,7 +116,7 @@ function Sidebar() {
         selected={profileDataUpdate.sentEmailFetchedDisplay}
       />
 
-      <SidebarOption Icon={NoteIcon} title="Drafts" number={5} />
+      <SidebarOption Icon={NoteIcon} title="Drafts" />
       <SidebarOption Icon={ExpandMoreIcon} title="More" />
       <div className="sidebar-footer">
         <div className="sidebar-footerIcons">
