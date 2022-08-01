@@ -24,10 +24,11 @@ import EmailRow from "../EmailRow/EmailRow";
 import parseMessage from "gmail-api-parse-message";
 
 function EmailList() {
-  const user = useSelector(selectUser);
+  //  const user = useSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem("user"));
   const data = useSelector(APIUserData);
 
-  const emailGathered = data.emailData.emailGathered;
+  const emailGathered = data.emailData?.emailGathered;
   const totalMessagesOfInbox = data.profiletotalInboxMessages;
 
   const dispatch = useDispatch();

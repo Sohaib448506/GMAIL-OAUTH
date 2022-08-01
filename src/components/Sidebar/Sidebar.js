@@ -38,7 +38,9 @@ function Sidebar() {
   const dispatch = useDispatch();
   const profileDataUpdate = useSelector(APIUserData);
 
-  const user = useSelector(selectUser);
+  //const user = useSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const profileDataTotalUnreadMessages = profileDataUpdate.profileData;
 
   const TotalSentMessages = profileDataUpdate.profileSentMessages;
@@ -74,7 +76,7 @@ function Sidebar() {
       .catch((error) => {
         console.error(error);
       });
-  }, [user]);
+  }, [user?.user_id]);
 
   return (
     <div className="sidebar">

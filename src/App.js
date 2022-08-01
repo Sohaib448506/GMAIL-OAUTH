@@ -22,7 +22,10 @@ import SentEmails from "./components/SentEmails/SentEmails";
 import Mail from "./components/Mail/Mail";
 
 function App() {
-  const user = useSelector(selectUser);
+  const userDependency = useSelector(selectUser);
+
+  const [user, setUser] = useState();
+
   const dispatch = useDispatch();
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
 
@@ -33,6 +36,12 @@ function App() {
   const ListRecord = useSelector(APIUserData);
   const singleDisplay = ListRecord.displaySingleMessage;
 
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userDependency]);
   useEffect(() => {
     dispatch(sentEmailFetchedDone(sentEmailFetched));
   }, [sentEmailFetched]);
@@ -63,7 +72,7 @@ function App() {
           }
         );
     }
-  }, [user]);
+  }, [user?.user_id]);
 
   useEffect(() => {
     if (user) {
@@ -79,7 +88,7 @@ function App() {
           console.error(error);
         });
     }
-  }, [user]);
+  }, [user?.user_id]);
 
   useEffect(() => {
     if (emailListIDs.length > 0) {

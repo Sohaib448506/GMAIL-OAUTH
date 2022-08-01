@@ -14,11 +14,11 @@ import { selectUser, logout } from "../../features/userSlice";
 
 function Header() {
   const user = useSelector(selectUser);
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
 
-  const signOut = () => {
-    dispatch(logout());
-  };
+  // const signOut = () => {
+  //   dispatch(logout());
+  // };
 
   return (
     <div className="header">
@@ -47,13 +47,13 @@ function Header() {
           <AppsIcon />
         </IconButton>
         <Avatar src={user?.photoUrl}></Avatar>
-        <a
+        {/* <a
           href="#"
           onClick={signOut}
           style={{ textDecoration: "underline", cursor: "pointer" }}
         >
           <h4>Sign Out</h4>
-        </a>
+        </a> */}
       </div>
     </div>
   );
