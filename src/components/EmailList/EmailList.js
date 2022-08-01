@@ -60,12 +60,13 @@ function EmailList() {
 
           if (parsedMessage.attachments) {
             const attachments = parsedMessage.attachments;
+
             var attachmentId;
+            let array = [];
             if (attachments.length > 1) {
-              let array = [];
               const gathered = attachments.map((x) => {
-                array = [...array, x.attachmentId];
-                return array;
+                const gatheredArray = [...array, x.attachmentId];
+                return gatheredArray;
               });
               attachmentId = gathered;
             } else attachmentId = parsedMessage.attachments[0].attachmentId;
