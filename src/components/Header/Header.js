@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Header.css";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -13,12 +13,19 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectUser, logout } from "../../features/userSlice";
 
 function Header() {
-  const user = useSelector(selectUser);
-  //const dispatch = useDispatch();
+  const userDependency = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   // const signOut = () => {
   //   dispatch(logout());
   // };
+  const [user, setUser] = useState();
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userDependency]);
 
   return (
     <div className="header">

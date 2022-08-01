@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
 
@@ -38,44 +38,52 @@ function Sidebar() {
   const dispatch = useDispatch();
   const profileDataUpdate = useSelector(APIUserData);
 
-  //const user = useSelector(selectUser);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const userDependency = useSelector(selectUser);
+
+  const [user, setUser] = useState();
 
   const profileDataTotalUnreadMessages = profileDataUpdate.profileData;
 
   const TotalSentMessages = profileDataUpdate.profileSentMessages;
   const totalMessages = profileDataUpdate.profiletotalMessages;
-
   useEffect(() => {
-    //for getting total Messages
-    InboxIDs(user)
-      .get(`/${user.user_id}/profile`)
-      .then((res) => {
-        dispatch(profiletotalMessages(res.data.messagesTotal));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    // for getting the unread messages
-    InboxIDs(user)
-      .get(`/${user.user_id}/labels/INBOX`)
-      .then((res) => {
-        dispatch(profiletotalInboxMessages(res.data.messagesTotal));
-        dispatch(profileData(res.data.messagesUnread));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userDependency]);
+  useEffect(() => {
+    if (user) {
+      //for getting total Messages
+      InboxIDs(user)
+        .get(`/${user.user_id}/profile`)
+        .then((res) => {
+          dispatch(profiletotalMessages(res.data.messagesTotal));
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      // for getting the unread messages
+      InboxIDs(user)
+        .get(`/${user.user_id}/labels/INBOX`)
+        .then((res) => {
+          dispatch(profiletotalInboxMessages(res.data.messagesTotal));
+          dispatch(profileData(res.data.messagesUnread));
+        })
+        .catch((error) => {
+          console.error(error);
+        });
 
-    //for getting sent messages
-    InboxIDs(user)
-      .get(`/${user.user_id}/labels/SENT`)
-      .then((res) => {
-        dispatch(profileSentMessages(res.data.messagesTotal));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      //for getting sent messages
+      InboxIDs(user)
+        .get(`/${user.user_id}/labels/SENT`)
+        .then((res) => {
+          dispatch(profileSentMessages(res.data.messagesTotal));
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }, [user?.user_id]);
 
   return (

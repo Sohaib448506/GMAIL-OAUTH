@@ -15,7 +15,7 @@ import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 
 import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
-//import { selectUser } from "../../features/userSlice";
+import { selectUser } from "../../features/userSlice";
 
 import InboxIDs from "../../components/api/InboxList";
 import Section from "../Section/Section";
@@ -24,8 +24,9 @@ import EmailRow from "../EmailRow/EmailRow";
 import parseMessage from "gmail-api-parse-message";
 
 function EmailList() {
-  //  const user = useSelector(selectUser);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const userDependency = useSelector(selectUser);
+
+  const [user, setUser] = useState();
   const data = useSelector(APIUserData);
 
   const emailGathered = data.emailData?.emailGathered;
@@ -45,6 +46,12 @@ function EmailList() {
 
   var nextPageToken = data.data?.nextPageToken;
 
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userDependency]);
   useMemo(() => {
     {
       if (emailGathered) {
