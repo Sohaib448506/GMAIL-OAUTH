@@ -15,7 +15,7 @@ import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 
 import { APIUserData, userData, displayEmails } from "../../features/dataSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser } from "../../features/userSlice";
+//import { selectUser } from "../../features/userSlice";
 
 import InboxIDs from "../../components/api/InboxList";
 import Section from "../Section/Section";

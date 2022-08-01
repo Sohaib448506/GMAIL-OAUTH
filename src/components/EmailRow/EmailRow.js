@@ -13,7 +13,7 @@ import {
 } from "../../features/dataSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import Mail from "../Mail/Mail";
+//import Mail from "../Mail/Mail";
 
 function EmailRow({
   id,
@@ -45,7 +45,7 @@ function EmailRow({
   const ListRecord = useSelector(APIUserData);
 
   const listDisplay = ListRecord.displayList;
-  const singleDisplay = ListRecord.displaySingleMessage;
+
   return (
     <>
       {listDisplay && (
