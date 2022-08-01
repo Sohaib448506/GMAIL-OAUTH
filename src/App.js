@@ -77,9 +77,7 @@ function App() {
   useEffect(() => {
     if (user) {
       InboxIDs(user)
-        .get(
-          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&q=category%3Aprimary`
-        )
+        .get(`/${user.user_id}/messages?labelIds=INBOX&maxResults=2`)
         .then((res) => {
           dispatch(userData(res.data));
           setEmailListIDs(res.data.messages);

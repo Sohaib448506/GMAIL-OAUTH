@@ -140,7 +140,7 @@ function EmailList() {
 
       InboxIDs(user)
         .get(
-          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${nextPageToken}&q=category%3Aprimary`
+          `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${nextPageToken}`
         )
         .then((res) => {
           {
@@ -185,7 +185,7 @@ function EmailList() {
   const prePageApIData = (token) => {
     InboxIDs(user)
       .get(
-        `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${token}&q=category%3Aprimary`
+        `/${user.user_id}/messages?labelIds=INBOX&maxResults=2&pageToken=${token}`
       )
       .then((res) => {
         {
