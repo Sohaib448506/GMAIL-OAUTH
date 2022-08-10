@@ -22,7 +22,7 @@ function Login() {
       .then(
         function (res) {
           var userObject = jwt_decode(res.Cc.id_token);
-          localStorage.setItem("user", JSON.stringify(userObject));
+          //localStorage.setItem("user", JSON.stringify(userObject));
           const { name, sub, picture, email } = userObject;
           const user = {
             _id: sub,
@@ -54,7 +54,7 @@ function Login() {
       .load("https://gmail.googleapis.com/$discovery/rest?version=v1")
       .then(
         function () {
-          console.log("window.GAPI client loaded for API");
+          // console.log("window.GAPI client loaded for API");
         },
         function (err) {
           console.error("Error loading window.GAPI client for API", err);

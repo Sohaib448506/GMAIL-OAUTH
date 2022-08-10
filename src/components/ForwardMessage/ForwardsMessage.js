@@ -43,6 +43,13 @@ function SendReply(props) {
       `${message}\r\n\r\n`,
 
       "--foo_bar_baz\r\n",
+      'Content-Type: text/html; charset="UTF-8"\r\n',
+      "MIME-Version: 1.0\r\n",
+      "Content-Transfer-Encoding: 7bit\r\n\r\n",
+
+      `${props.props.textHTML}\r\n\r\n`,
+
+      "--foo_bar_baz\r\n",
       "Content-Type: image/png\r\n",
       "MIME-Version: 1.0\r\n",
       "Content-Transfer-Encoding: base64\r\n",
